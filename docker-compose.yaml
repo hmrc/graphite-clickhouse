@@ -1,0 +1,280 @@
+version: '3.7'
+services:
+
+  zoo1:
+    image: zookeeper
+    restart: always
+    hostname: zoo1
+    ports: # https://docs.hortonworks.com/HDPDocuments/HDP2/HDP-2.6.4/bk_reference/content/zookeeper-ports.html
+      - 2181:2181
+    expose:
+      - 2181
+      - 2888
+      - 3888
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=0.0.0.0:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
+
+  zoo2:
+    image: zookeeper
+    restart: always
+    hostname: zoo2
+    ports: # https://docs.hortonworks.com/HDPDocuments/HDP2/HDP-2.6.4/bk_reference/content/zookeeper-ports.html
+      - 2182:2181
+    expose:
+      - 2181
+      - 2888
+      - 3888
+    environment:
+      ZOO_MY_ID: 2
+      ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=0.0.0.0:2888:3888 server.3=zoo3:2888:3888
+
+  zoo3:
+    image: zookeeper
+    restart: always
+    hostname: zoo3
+    ports: # https://docs.hortonworks.com/HDPDocuments/HDP2/HDP-2.6.4/bk_reference/content/zookeeper-ports.html
+      - 2183:2181
+    expose:
+      - 2181
+      - 2888
+      - 3888
+    environment:
+      ZOO_MY_ID: 3
+      ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=0.0.0.0:2888:3888
+
+  cclick-proxy: # Place to send metrics to.
+    image: haproxy:alpine
+    hostname: cclick-proxy
+    volumes:
+      - "./cclick-proxy.conf:/etc/cclick-proxy.conf"
+    entrypoint: |
+      sh -c '/usr/local/sbin/haproxy -f /etc/cclick-proxy.conf'
+    ports:
+      - "2003:2003"
+      - "2004:2004"
+      - "2006:2006"
+    expose:
+      - 2003
+      - 2004
+      - 2006
+    depends_on:
+      - click1
+      - click2
+      - click3
+
+  clickhouse-init:
+    image: yandex/clickhouse-server
+    volumes:
+      - "./init.sql:/init.sql"
+    entrypoint: |
+      bash -c '
+        sleep 2
+        export HOME=/var/lib/clickhouse/
+        cat /init.sql | clickhouse client --host click1 --multiquery'
+    depends_on:
+      - click1
+      - click2
+      - click3
+
+####################
+  cclick1:
+    hostname: cclick1
+    build:
+      context: "./dockerfiles/carbon-clickhouse"
+    volumes:
+      - "./data/cclick1:/data/carbon-clickhouse"
+      - "./cclick1.conf:/etc/carbon-clickhouse/carbon-clickhouse.conf"
+    expose:
+      - 2003 # plain tcp
+      - 2004 # pickle
+      - 2006 # prometheus remote write
+    depends_on:
+      - click1
+      - clickhouse-init
+
+  click1:
+    hostname: click1
+    image: yandex/clickhouse-server
+    volumes:
+      - "./clickhouse.xml:/etc/clickhouse-server/config.xml"
+      - "./rollup.xml:/etc/clickhouse-server/config.d/rollup.xml"
+      - "./data/click1/data:/var/lib/clickhouse/data"
+      - "./data/click1/metadata:/var/lib/clickhouse/metadata"
+    environment:
+      ZOO_SERVERS: zoo1:2181 zoo2:2181 zoo3:2181
+    expose:
+      - 8123
+      - 9000
+      - 9009
+      - 8443
+      - 9440
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    depends_on:
+      - zoo1
+      - zoo2
+      - zoo3
+    command: /usr/bin/clickhouse-server --config=/etc/clickhouse-server/config.xml
+
+  gclick1:
+    hostname: gclick1
+    build:
+      context: "./dockerfiles/graphite-clickhouse"
+    volumes:
+      - "./rollup.xml:/etc/graphite-clickhouse/rollup.xml"
+      - "./gclick1.conf:/etc/graphite-clickhouse/graphite-clickhouse.conf"
+    expose:
+      - 9090
+    depends_on:
+      - click1
+      - clickhouse-init
+
+#####################
+
+  cclick2:
+    hostname: cclick2
+    build:
+      context: "./dockerfiles/carbon-clickhouse"
+    volumes:
+      - "./data/cclick2:/data/carbon-clickhouse"
+      - "./cclick2.conf:/etc/carbon-clickhouse/carbon-clickhouse.conf"
+    expose:
+      - 2003 # plain tcp
+      - 2004 # pickle
+      - 2006 # prometheus remote write
+    depends_on:
+      - click2
+      - clickhouse-init
+
+  click2:
+    hostname: click2
+    image: yandex/clickhouse-server
+    volumes:
+      - "./clickhouse.xml:/etc/clickhouse-server/config.xml"
+      - "./rollup.xml:/etc/clickhouse-server/config.d/rollup.xml"
+      - "./data/click2/data:/var/lib/clickhouse/data"
+      - "./data/click2/metadata:/var/lib/clickhouse/metadata"
+    environment:
+      ZOO_SERVERS: zoo1:2181 zoo2:2181 zoo3:2181
+    expose:
+      - 8123
+      - 9000
+      - 9009
+      - 8443
+      - 9440
+    depends_on:
+      - zoo1
+      - zoo2
+      - zoo3
+    command: /usr/bin/clickhouse-server --config=/etc/clickhouse-server/config.xml
+
+  gclick2:
+    hostname: gclick2
+    build:
+      context: "./dockerfiles/graphite-clickhouse"
+    volumes:
+      - "./rollup.xml:/etc/graphite-clickhouse/rollup.xml"
+      - "./gclick2.conf:/etc/graphite-clickhouse/graphite-clickhouse.conf"
+    expose:
+      - 9090
+    depends_on:
+      - click2
+      - clickhouse-init
+
+########################
+
+  cclick3:
+    hostname: cclick3
+    build:
+      context: "./dockerfiles/carbon-clickhouse"
+    volumes:
+      - "./data/cclick3:/data/carbon-clickhouse"
+      - "./cclick3.conf:/etc/carbon-clickhouse/carbon-clickhouse.conf"
+    expose:
+      - 2003 # plain tcp
+      - 2004 # pickle
+      - 2006 # prometheus remote write
+    depends_on:
+      - click3
+      - clickhouse-init
+
+  click3:
+    hostname: click3
+    image: yandex/clickhouse-server
+    volumes:
+      - "./clickhouse.xml:/etc/clickhouse-server/config.xml"
+      - "./rollup.xml:/etc/clickhouse-server/config.d/rollup.xml"
+      - "./data/click3/data:/var/lib/clickhouse/data"
+      - "./data/click3/metadata:/var/lib/clickhouse/metadata"
+    environment:
+      ZOO_SERVERS: zoo1:2181 zoo2:2181 zoo3:2181
+    expose:
+      - 8123
+      - 9000
+      - 9009
+      - 8443
+      - 9440
+    depends_on:
+      - zoo1
+      - zoo2
+      - zoo3
+    command: /usr/bin/clickhouse-server --config=/etc/clickhouse-server/config.xml
+
+  gclick3:
+    hostname: gclick3
+    build:
+      context: "./dockerfiles/graphite-clickhouse"
+    volumes:
+      - "./rollup.xml:/etc/graphite-clickhouse/rollup.xml"
+      - "./gclick3.conf:/etc/graphite-clickhouse/graphite-clickhouse.conf"
+    expose:
+      - 9090
+    depends_on:
+      - click3
+      - clickhouse-init
+
+########################
+
+  carbonapi:
+    hostname: carbonapi
+    build:
+      context: "./dockerfiles/carbonapi"
+    volumes:
+      - "./carbonapi.yaml:/etc/carbonapi.yaml"
+      - "./carbonapi_entrypoint.sh:/entrypoint.sh"
+    command: ["/sbin/carbonapi", "-config", "/etc/carbonapi.yaml"]
+    expose:
+      - 8080
+    depends_on:
+      - gclick1
+      - gclick2
+      - gclick3
+
+  grafana:
+    hostname: grafana
+    image: grafana/grafana
+    volumes:
+      - "./grafana/datasources:/etc/grafana/provisioning/datasources"
+      - "./data/grafana/data:/var/lib/grafana/"
+    ports:
+      - "3000:3000" # http ui
+    expose:
+      - 3000
+    depends_on:
+      - carbonapi
+
+  graphite-web:
+    hostname: graphite-web
+    image: graphiteapp/graphite-statsd # consider moving to banno/graphite-web which looks smaller 
+    volumes:
+      - "./graphiteweb_entrypoint.sh:/entrypoint.sh"
+      - "./graphiteweb.conf:/opt/graphite/webapp/graphite/local_settings.py"
+    entrypoint: /entrypoint.sh
+    ports:
+      - "80:80" # http ui
+    expose:
+      - 80
+    depends_on:
+      - carbonapi

@@ -1,0 +1,30 @@
+apiVersion: 1
+
+deleteDatasources:
+  - name: graphite-web
+    orgId: 1
+
+datasources:
+- name: carbonapi
+  type: graphite
+  access: proxy
+  orgId: 1
+  url: http://carbonapi/
+  password:
+  user:
+  database:
+  basicAuth:
+  basicAuthUser:
+  basicAuthPassword:
+  withCredentials:
+  isDefault: true
+  jsonData:
+     graphiteVersion: "1.1"
+     tlsAuth:
+     tlsAuthWithCACert:
+  secureJsonData:
+    tlsCACert: "..."
+    tlsClientCert: "..."
+    tlsClientKey: "..."
+  version: 1
+  editable: true

@@ -1,0 +1,27 @@
+#zipper: "graphite-clickhouse:9090"
+listen: ":8080"
+concurency: 20
+cache:
+   type: "mem"
+   size_mb: 10
+   defaultTimeoutSec: 60
+cpus: 1
+tz: ""
+maxBatchSize: 100
+graphite:
+    host: "carbon-clickhouse:2003"
+    interval: "60s"
+    prefix: "carbon.api"
+    pattern: "{prefix}.{fqdn}"
+idleConnections: 10
+pidFile: ""
+upstreams:
+    backends:
+        - "http://graphite-clickhouse:9090"
+logger:
+    - logger: ""
+      file: "stderr"
+      level: "debug"
+      encoding: "console"
+      encodingTime: "iso8601"
+      encodingDuration: "seconds"
