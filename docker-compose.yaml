@@ -1,8 +1,16 @@
 version: '3.7'
 services:
-  clickhouse:
+  clickhouse-server-1:
     build:
       context: ./clickhouse-server
     volumes:
       - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
     privileged: true
+    expose:
+      - 9000
+  clickhouse-client:
+    build:
+      context: ./clickhouse-client
+    depends_on:
+      - clickhouse-server-1
+    entrypoint: clickhouse-client --host=clickhouse-server-1
