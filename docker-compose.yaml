@@ -2,6 +2,7 @@ version: '3.7'
 services:
   clickhouse:
     build:
-      context: ./dockerfiles/clickhouse-server
+      context: ./clickhouse-server
     volumes:
-          - ./logs/clickhouse-server:/var/log/clickhouse-server/
+      - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
+    privileged: true

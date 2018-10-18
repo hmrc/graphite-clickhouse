@@ -18,6 +18,6 @@ RUN DEBIAN_FRONTEND=noninteractive \
 RUN cat /etc/clickhouse-server/config.xml
 
 
-ENTRYPOINT /usr/bin/clickhouse-server
+ENTRYPOINT /usr/bin/clickhouse-server --config-file=/etc/clickhouse-server/config.xml
 
 
