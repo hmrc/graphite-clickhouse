@@ -1,0 +1,7 @@
+version: '3.7'
+services:
+  clickhouse:
+    build:
+      context: ./dockerfiles/clickhouse-server
+    volumes:
+          - ./logs/clickhouse-server:/var/log/clickhouse-server/
