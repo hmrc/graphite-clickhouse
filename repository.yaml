@@ -1,0 +1,8 @@
+leakDetectionExemptions:
+  - ruleId: 'ip_addresses'
+    filePaths:
+      - '/archive/clickhouse.xml'
+      - '/archive/dockerfiles/carbonapi/carbonapi.yaml'
+      - '/archive/cclick-proxy.conf'
+      - '/archive/docker-compose.yaml'
+      - '/clickhouse-server/config.xml'
