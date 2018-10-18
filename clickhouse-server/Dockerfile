@@ -15,9 +15,6 @@ RUN DEBIAN_FRONTEND=noninteractive \
                 apt-get install --allow-unauthenticated --yes --no-install-recommends \
                     clickhouse-common-static=$version \
                     clickhouse-server=$version
-RUN cat /etc/clickhouse-server/config.xml
 
 
 ENTRYPOINT /usr/bin/clickhouse-server --config-file=/etc/clickhouse-server/config.xml
-
-

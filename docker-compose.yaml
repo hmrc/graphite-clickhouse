@@ -5,12 +5,36 @@ services:
       context: ./clickhouse-server
     volumes:
       - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
+      - ./clickhouse-server/rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
     privileged: true
     expose:
       - 9000
+      - 8123
   clickhouse-client:
     build:
       context: ./clickhouse-client
     depends_on:
       - clickhouse-server-1
-    entrypoint: clickhouse-client --host=clickhouse-server-1
+    volumes:
+      - "./clickhouse-client/init.sql:/init.sql"
+    entrypoint: |
+      bash -c '
+        sleep 2
+        export HOME=/var/lib/clickhouse/
+        cat /init.sql | clickhouse client --host clickhouse-server-1 --multiquery'
+  carbon-clickhouse:
+    build:
+      context: ./carbon-clickhouse
+    volumes:
+      - ./carbon-clickhouse/config.conf:/etc/carbon-clickhouse/config.conf
+      - ./carbon-clickhouse/logs:/var/log/carbon-clickhouse/
+      - ./carbon-clickhouse/data:/data/carbon-clickhouse/
+    depends_on:
+      - clickhouse-client
+    ports:
+      - 2003:2003
+      - 2004:2004
+      - 2005:2005
+      - 2006:2006
+      - 2007:2007
+      - 7007:7007
