@@ -6,3 +6,4 @@ leakDetectionExemptions:
       - '/archive/cclick-proxy.conf'
       - '/archive/docker-compose.yaml'
       - '/clickhouse-server/config.xml'
+      - '/docker-compose.yaml'
