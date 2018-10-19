@@ -1,8 +1,39 @@
 version: '3.7'
 services:
+  zookeeper-1:
+    image: zookeeper
+    expose:
+      - 2181
+      - 2888
+      - 3888
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=localhost:2888:3888 server.2=zookeeper-2:2888:3888 server.3=zookeeper-3:2888:3888
+  zookeeper-2:
+    image: zookeeper
+    expose:
+      - 2181
+      - 2888
+      - 3888
+    environment:
+      ZOO_MY_ID: 2
+      ZOO_SERVERS: server.1=zookeeper-1:2888:3888 server.2=localhost:2888:3888 server.3=zookeeper-3:2888:3888
+  zookeeper-3:
+    image: zookeeper
+    expose:
+      - 2181
+      - 2888
+      - 3888
+    environment:
+      ZOO_MY_ID: 3
+      ZOO_SERVERS: server.1=zookeeper-1:2888:3888 server.2=zookeeper-2:2888:3888 server.3=localhost:2888:3888
   clickhouse-server-1:
     build:
       context: ./clickhouse-server
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
     volumes:
       - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
       - ./clickhouse-server/rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
