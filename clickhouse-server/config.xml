@@ -366,4 +366,10 @@
 
     <!-- Uncomment to disable ClickHouse internal DNS caching. -->
     <!-- <disable_internal_dns_cache>1</disable_internal_dns_cache> -->
+
+    <macros>
+        <layer>05</layer>
+        <shard>02</shard>
+        <replica>graphite-replica</replica>
+    </macros>
 </yandex>
