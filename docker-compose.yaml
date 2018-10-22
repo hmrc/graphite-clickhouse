@@ -58,6 +58,30 @@ services:
     expose:
       - 9000
       - 8123
+  clickhouse-server-2:
+    build:
+      context: ./clickhouse-server
+    depends_on:
+      - clickhouse-server-1
+    volumes:
+      - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
+      - ./clickhouse-server/rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
+    privileged: true
+    expose:
+      - 9000
+      - 8123
+  clickhouse-server-3:
+    build:
+      context: ./clickhouse-server
+    depends_on:
+      - clickhouse-server-2
+    volumes:
+      - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
+      - ./clickhouse-server/rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
+    privileged: true
+    expose:
+      - 9000
+      - 8123
   clickhouse-init:
     build:
       context: ./clickhouse-init
@@ -69,7 +93,9 @@ services:
       bash -c '
         sleep 2
         export HOME=/var/lib/clickhouse/
-        cat /init.sql | clickhouse client --host clickhouse-server-1 --multiquery'
+        cat /init.sql | clickhouse client --host clickhouse-server-1 --multiquery
+        cat /init.sql | clickhouse client --host clickhouse-server-2 --multiquery
+        cat /init.sql | clickhouse client --host clickhouse-server-3 --multiquery'
   carbon-clickhouse:
     build:
       context: ./carbon-clickhouse

@@ -147,8 +147,9 @@
     <!-- Configuration of clusters that could be used in Distributed tables.
          https://clickhouse.yandex/docs/en/table_engines/distributed/
       -->
+
+    <!-- WHITER moving this to a separate file
     <remote_servers incl="clickhouse_remote_servers" >
-        <!-- Test only shard config for testing distributed storage -->
         <test_shard_localhost>
             <shard>
                 <replica>
@@ -167,7 +168,7 @@
             </shard>
         </test_shard_localhost_secure>
     </remote_servers>
-
+    -->
 
     <!-- If element has 'incl' attribute, then for it's value will be used corresponding substitution from another file.
          By default, path to file with substitutions is /etc/metrika.xml. It could be changed in config in 'include_from' element.
@@ -367,9 +368,35 @@
     <!-- Uncomment to disable ClickHouse internal DNS caching. -->
     <!-- <disable_internal_dns_cache>1</disable_internal_dns_cache> -->
 
+    <!-- Macro example, these variables become available elsewhere in config
     <macros>
         <layer>05</layer>
         <shard>02</shard>
         <replica>graphite-replica</replica>
     </macros>
+      -->
+
+    <remote_servers>
+        <hmrc_data_cluster>
+            <shard>
+                <replica>
+                    <host>graphite-clickhouse_clickhouse-server-1_1</host>
+                    <port>9000</port>
+                </replica>
+            </shard>
+            <shard>
+                <replica>
+                    <host>graphite-clickhouse_clickhouse-server-2_1</host>
+                    <port>9000</port>
+                </replica>
+            </shard>
+            <shard>
+                <replica>
+                    <host>graphite-clickhouse_clickhouse-server-3_1</host>
+                    <port>9000</port>
+                </replica>
+            </shard>
+        </hmrc_data_cluster>
+    </remote_servers>
+
 </yandex>
