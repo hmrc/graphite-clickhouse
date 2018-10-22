@@ -1,6 +1,4 @@
-CREATE DATABASE IF NOT EXISTS metrics;
-
-CREATE TABLE IF NOT EXISTS metrics.graphite (
+CREATE TABLE IF NOT EXISTS default.graphite (
   Path String,
   Value Float64,
   Time UInt32,
@@ -9,7 +7,7 @@ CREATE TABLE IF NOT EXISTS metrics.graphite (
 ) ENGINE = GraphiteMergeTree(Date, (Path, Time), 8192, 'graphite_rollup');
 
 -- optional table for faster metric search
-CREATE TABLE IF NOT EXISTS metrics.graphite_tree (
+CREATE TABLE IF NOT EXISTS default.graphite_tree (
   Date Date,
   Level UInt32,
   Path String,
@@ -17,9 +15,9 @@ CREATE TABLE IF NOT EXISTS metrics.graphite_tree (
   Version UInt32
 ) ENGINE = ReplacingMergeTree(Date, (Level, Path), 8192, Version);
 
-CREATE TABLE IF NOT EXISTS default.graphite AS metrics.graphite
-ENGINE = Distributed('hmrc_data_cluster', 'metrics', 'graphite');
+CREATE TABLE IF NOT EXISTS graphite_distributed AS default.graphite
+ENGINE = Distributed('hmrc_data_cluster', 'default', 'graphite');
 
-CREATE TABLE IF NOT EXISTS default.graphite_tree AS metrics.graphite_tree
-ENGINE = Distributed('hmrc_data_cluster', 'metrics', 'graphite_tree');
+CREATE TABLE IF NOT EXISTS graphite_tree_distributed AS default.graphite_tree
+ENGINE = Distributed('hmrc_data_cluster', 'default', 'graphite_tree');
 

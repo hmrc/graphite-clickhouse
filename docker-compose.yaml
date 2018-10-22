@@ -86,7 +86,7 @@ services:
     build:
       context: ./clickhouse-init
     depends_on:
-      - clickhouse-server-1
+      - clickhouse-server-3
     volumes:
       - "./clickhouse-init/init.sql:/init.sql"
     entrypoint: |
@@ -101,7 +101,6 @@ services:
       context: ./carbon-clickhouse
     volumes:
       - ./carbon-clickhouse/config.conf:/etc/carbon-clickhouse/config.conf
-      - ./carbon-clickhouse/logs:/var/log/carbon-clickhouse/
       - ./carbon-clickhouse/data:/data/carbon-clickhouse/
     depends_on:
       - clickhouse-init
