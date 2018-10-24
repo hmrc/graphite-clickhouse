@@ -335,16 +335,16 @@
 
     <remote_servers>
         <hmrc_data_cluster>
+
             <shard>
                 <internal_replication>false</internal_replication>
                 <replica>
+                    <default_database>testcluster_shard_1</default_database>
                     <host>graphite-clickhouse_clickhouse-server-1_1</host>
                     <port>9000</port>
                 </replica>
-            </shard>
-            <shard>
-                <internal_replication>false</internal_replication>
                 <replica>
+                    <default_database>testcluster_shard_1</default_database>
                     <host>graphite-clickhouse_clickhouse-server-2_1</host>
                     <port>9000</port>
                 </replica>
@@ -352,7 +352,26 @@
             <shard>
                 <internal_replication>false</internal_replication>
                 <replica>
+                    <default_database>testcluster_shard_2</default_database>
+                    <host>graphite-clickhouse_clickhouse-server-2_1</host>
+                    <port>9000</port>
+                </replica>
+                <replica>
+                    <default_database>testcluster_shard_2</default_database>
                     <host>graphite-clickhouse_clickhouse-server-3_1</host>
+                    <port>9000</port>
+                </replica>
+            </shard>
+            <shard>
+                <internal_replication>false</internal_replication>
+                <replica>
+                    <default_database>testcluster_shard_3</default_database>
+                    <host>graphite-clickhouse_clickhouse-server-3_1</host>
+                    <port>9000</port>
+                </replica>
+                <replica>
+                    <default_database>testcluster_shard_3</default_database>
+                    <host>graphite-clickhouse_clickhouse-server-1_1</host>
                     <port>9000</port>
                 </replica>
             </shard>

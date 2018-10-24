@@ -91,14 +91,25 @@ services:
     depends_on:
       - clickhouse-server-3
     volumes:
-      - "./clickhouse-init/init2.sql:/init.sql"
+      - "./clickhouse-init/init_local_tables_1.sql:/init_local_tables_1.sql"
+      - "./clickhouse-init/init_local_tables_2.sql:/init_local_tables_2.sql"
+      - "./clickhouse-init/init_local_tables_3.sql:/init_local_tables_3.sql"
+      - "./clickhouse-init/init_distributed_tables.sql:/init_distributed_tables.sql"
+      - "./clickhouse-init/create-database.sql:/create-database.sql"
     entrypoint: |
       bash -c '
         sleep 2
         export HOME=/var/lib/clickhouse/
-        cat /init.sql | clickhouse client --host clickhouse-server-1 --multiquery
-        cat /init.sql | clickhouse client --host clickhouse-server-2 --multiquery
-        cat /init.sql | clickhouse client --host clickhouse-server-3 --multiquery'
+        cat /create-database.sql | clickhouse client --host clickhouse-server-1 --multiquery
+        cat /create-database.sql | clickhouse client --host clickhouse-server-2 --multiquery
+        cat /create-database.sql | clickhouse client --host clickhouse-server-3 --multiquery
+        cat /init_local_tables_1.sql | clickhouse client --host clickhouse-server-1 --multiquery
+        cat /init_local_tables_2.sql | clickhouse client --host clickhouse-server-2 --multiquery
+        cat /init_local_tables_3.sql | clickhouse client --host clickhouse-server-3 --multiquery
+        cat /init_distributed_tables.sql | clickhouse client --host clickhouse-server-1 --database default --multiquery
+        cat /init_distributed_tables.sql | clickhouse client --host clickhouse-server-2 --database default --multiquery
+        cat /init_distributed_tables.sql | clickhouse client --host clickhouse-server-3 --database default --multiquery'
+
   carbon-clickhouse:
     build:
       context: ./carbon-clickhouse

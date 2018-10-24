@@ -6,7 +6,7 @@ INTERVAL=30
 PORTS="2003"
 
 # If this is Linux the netcat cr/lf option is different than on a Mac
-if [[ "$(uname -o)" =~ "GNU/Linux" ]]; then
+if [[ "$(uname)" =~ "GNU/Linux" ]]; then
   NC_KEY=C
 fi
 
