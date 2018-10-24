@@ -148,28 +148,6 @@
          https://clickhouse.yandex/docs/en/table_engines/distributed/
       -->
 
-    <!-- WHITER moving this to a separate file
-    <remote_servers incl="clickhouse_remote_servers" >
-        <test_shard_localhost>
-            <shard>
-                <replica>
-                    <host>localhost</host>
-                    <port>9000</port>
-                </replica>
-            </shard>
-        </test_shard_localhost>
-        <test_shard_localhost_secure>
-            <shard>
-                <replica>
-                    <host>localhost</host>
-                    <port>9440</port>
-                    <secure>1</secure>
-                </replica>
-            </shard>
-        </test_shard_localhost_secure>
-    </remote_servers>
-    -->
-
     <!-- If element has 'incl' attribute, then for it's value will be used corresponding substitution from another file.
          By default, path to file with substitutions is /etc/metrika.xml. It could be changed in config in 'include_from' element.
          Values for substitutions are specified in /yandex/name_of_substitution elements in that file.
@@ -180,15 +158,8 @@
 
          See https://clickhouse.yandex/docs/en/table_engines/replication/
       -->
-    <zookeeper incl="zookeeper-servers" optional="true" />
 
-    <!-- Substitutions for parameters of replicated tables.
-          Optional. If you don't use replicated tables, you could omit that.
-
-         See https://clickhouse.yandex/docs/en/table_engines/replication/#creating-replicated-tables
-      -->
     <macros incl="macros" optional="true" />
-
 
     <!-- Reloading interval for embedded dictionaries, in seconds. Default: 3600. -->
     <builtin_dictionaries_reload_interval>3600</builtin_dictionaries_reload_interval>
@@ -287,20 +258,6 @@
     <!-- Uncomment if you want data to be compressed 30-100% better.
          Don't do that if you just started using ClickHouse.
       -->
-    <compression incl="clickhouse_compression">
-        <!--
-            <!- - Set of variants. Checked in order. Last matching case wins. If nothing matches, lz4 will be used. - ->
-            <case>
-
-                <!- - Conditions. All must be satisfied. Some conditions may be omitted. - ->
-                <min_part_size>10000000000</min_part_size>        <!- - Min part size in bytes. - ->
-                <min_part_size_ratio>0.01</min_part_size_ratio>   <!- - Min size of part relative to whole table size. - ->
-
-                <!- - What compression method to use. - ->
-                <method>zstd</method>
-            </case>
-        -->
-    </compression>
 
     <!-- Allow to execute distributed DDL queries (CREATE, DROP, ALTER, RENAME) on cluster.
          Works only if ZooKeeper is enabled. Comment it if such functionality isn't required. -->
@@ -401,5 +358,26 @@
             </shard>
         </hmrc_data_cluster>
     </remote_servers>
+
+    <compression>
+        <case>
+            <method>zstd</method>  
+        </case>
+    </compression>
+
+    <zookeeper>
+        <node>
+            <host>graphite-clickhouse_zookeeper-1_1</host>
+            <port>2181</port>
+        </node>
+        <node>
+            <host>graphite-clickhouse_zookeeper-2_1</host>
+            <port>2181</port>
+        </node>
+        <node>
+            <host>graphite-clickhouse_zookeeper-3_1</host>
+            <port>2181</port>
+        </node>
+    </zookeeper>
 
 </yandex>

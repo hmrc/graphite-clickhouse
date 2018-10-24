@@ -5,7 +5,7 @@ services:
     restart: always
     hostname: zookeeper-1
     ports:
-      - 2181:2181
+      - 2182:2181
     expose:
       - 2181
       - 2888
@@ -18,7 +18,7 @@ services:
     restart: always
     hostname: zookeeper-2
     ports:
-      - 2182:2181
+      - 2183:2181
     expose:
       - 2181
       - 2888
@@ -33,7 +33,7 @@ services:
     restart: always
     hostname: zookeeper-3
     ports:
-      - 2183:2181
+      - 2184:2181
     expose:
       - 2181
       - 2888
@@ -54,6 +54,7 @@ services:
     volumes:
       - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
       - ./clickhouse-server/rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
+      - ./clickhouse-server/server1_macros.xml:/etc/clickhouse-server/config.d/server1_macros.xml
     privileged: true
     expose:
       - 9000
@@ -66,6 +67,7 @@ services:
     volumes:
       - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
       - ./clickhouse-server/rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
+      - ./clickhouse-server/server2_macros.xml:/etc/clickhouse-server/config.d/server2_macros.xml
     privileged: true
     expose:
       - 9000
@@ -78,6 +80,7 @@ services:
     volumes:
       - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
       - ./clickhouse-server/rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
+      - ./clickhouse-server/server3_macros.xml:/etc/clickhouse-server/config.d/server3_macros.xml
     privileged: true
     expose:
       - 9000
@@ -88,7 +91,7 @@ services:
     depends_on:
       - clickhouse-server-3
     volumes:
-      - "./clickhouse-init/init.sql:/init.sql"
+      - "./clickhouse-init/init2.sql:/init.sql"
     entrypoint: |
       bash -c '
         sleep 2

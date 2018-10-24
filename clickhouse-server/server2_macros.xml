@@ -1,0 +1,6 @@
+<yandex>
+    <macros>
+        <shard1>02</shard1>
+        <replica1>graphite-clickhouse_clickhouse-server-2_1</replica1>
+    </macros>
+</yandex>

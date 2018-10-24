@@ -3,7 +3,7 @@ FROM ubuntu:16.04
 ARG version=18.14.9
 
 RUN apt-get update
-RUN apt-get install -y software-properties-common iputils-ping netcat
+RUN apt-get install -y software-properties-common iputils-ping netcat binutils
 RUN apt-add-repository -y 'deb http://repo.yandex.ru/clickhouse/deb/stable/ main/'
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv E0C56BD4
 RUN apt-get update \
