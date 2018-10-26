@@ -54,7 +54,6 @@ services:
     volumes:
       - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
       - ./clickhouse-server/rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
-      - ./clickhouse-server/server1_macros.xml:/etc/clickhouse-server/config.d/server1_macros.xml
     privileged: true
     expose:
       - 9000
@@ -67,7 +66,6 @@ services:
     volumes:
       - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
       - ./clickhouse-server/rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
-      - ./clickhouse-server/server2_macros.xml:/etc/clickhouse-server/config.d/server2_macros.xml
     privileged: true
     expose:
       - 9000
@@ -80,7 +78,18 @@ services:
     volumes:
       - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
       - ./clickhouse-server/rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
-      - ./clickhouse-server/server3_macros.xml:/etc/clickhouse-server/config.d/server3_macros.xml
+    privileged: true
+    expose:
+      - 9000
+      - 8123
+  clickhouse-server-4:
+    build:
+      context: ./clickhouse-server
+    depends_on:
+      - clickhouse-server-3
+    volumes:
+      - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
+      - ./clickhouse-server/rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
     privileged: true
     expose:
       - 9000
@@ -89,11 +98,12 @@ services:
     build:
       context: ./clickhouse-init
     depends_on:
-      - clickhouse-server-3
+      - clickhouse-server-4
     volumes:
       - "./clickhouse-init/init_local_tables_1.sql:/init_local_tables_1.sql"
       - "./clickhouse-init/init_local_tables_2.sql:/init_local_tables_2.sql"
       - "./clickhouse-init/init_local_tables_3.sql:/init_local_tables_3.sql"
+      - "./clickhouse-init/init_local_tables_4.sql:/init_local_tables_4.sql"
       - "./clickhouse-init/init_distributed_tables.sql:/init_distributed_tables.sql"
       - "./clickhouse-init/create-database.sql:/create-database.sql"
     entrypoint: |
@@ -103,12 +113,15 @@ services:
         cat /create-database.sql | clickhouse client --host clickhouse-server-1 --multiquery
         cat /create-database.sql | clickhouse client --host clickhouse-server-2 --multiquery
         cat /create-database.sql | clickhouse client --host clickhouse-server-3 --multiquery
+        cat /create-database.sql | clickhouse client --host clickhouse-server-4 --multiquery
         cat /init_local_tables_1.sql | clickhouse client --host clickhouse-server-1 --multiquery
         cat /init_local_tables_2.sql | clickhouse client --host clickhouse-server-2 --multiquery
         cat /init_local_tables_3.sql | clickhouse client --host clickhouse-server-3 --multiquery
+        cat /init_local_tables_4.sql | clickhouse client --host clickhouse-server-4 --multiquery
         cat /init_distributed_tables.sql | clickhouse client --host clickhouse-server-1 --database default --multiquery
         cat /init_distributed_tables.sql | clickhouse client --host clickhouse-server-2 --database default --multiquery
-        cat /init_distributed_tables.sql | clickhouse client --host clickhouse-server-3 --database default --multiquery'
+        cat /init_distributed_tables.sql | clickhouse client --host clickhouse-server-3 --database default --multiquery
+        cat /init_distributed_tables.sql | clickhouse client --host clickhouse-server-4 --database default --multiquery'
 
   carbon-clickhouse:
     build:
