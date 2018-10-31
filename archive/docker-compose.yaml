@@ -66,7 +66,9 @@ services:
   clickhouse-init:
     image: yandex/clickhouse-server
     volumes:
-      - "./init.sql:/init.sql"
+      - "./init_local_tables_1.sql:/init_local_tables_1.sql"
+      - "./init_local_tables_2.sql:/init_local_tables_2.sql"
+      - "./init_local_tables_3.sql:/init_local_tables_3.sql"
     entrypoint: |
       bash -c '
         sleep 2

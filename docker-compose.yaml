@@ -5,7 +5,7 @@ services:
     restart: always
     hostname: zookeeper-1
     ports:
-      - 2181:2181
+      - 2182:2181
     expose:
       - 2181
       - 2888
@@ -18,7 +18,7 @@ services:
     restart: always
     hostname: zookeeper-2
     ports:
-      - 2182:2181
+      - 2183:2181
     expose:
       - 2181
       - 2888
@@ -33,7 +33,7 @@ services:
     restart: always
     hostname: zookeeper-3
     ports:
-      - 2183:2181
+      - 2184:2181
     expose:
       - 2181
       - 2888
@@ -58,24 +58,76 @@ services:
     expose:
       - 9000
       - 8123
+  clickhouse-server-2:
+    build:
+      context: ./clickhouse-server
+    depends_on:
+      - clickhouse-server-1
+    volumes:
+      - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
+      - ./clickhouse-server/rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
+    privileged: true
+    expose:
+      - 9000
+      - 8123
+  clickhouse-server-3:
+    build:
+      context: ./clickhouse-server
+    depends_on:
+      - clickhouse-server-2
+    volumes:
+      - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
+      - ./clickhouse-server/rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
+    privileged: true
+    expose:
+      - 9000
+      - 8123
+  clickhouse-server-4:
+    build:
+      context: ./clickhouse-server
+    depends_on:
+      - clickhouse-server-3
+    volumes:
+      - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
+      - ./clickhouse-server/rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
+    privileged: true
+    expose:
+      - 9000
+      - 8123
   clickhouse-init:
     build:
       context: ./clickhouse-init
     depends_on:
-      - clickhouse-server-1
+      - clickhouse-server-4
     volumes:
-      - "./clickhouse-init/init.sql:/init.sql"
+      - "./clickhouse-init/init_local_tables_1.sql:/init_local_tables_1.sql"
+      - "./clickhouse-init/init_local_tables_2.sql:/init_local_tables_2.sql"
+      - "./clickhouse-init/init_local_tables_3.sql:/init_local_tables_3.sql"
+      - "./clickhouse-init/init_local_tables_4.sql:/init_local_tables_4.sql"
+      - "./clickhouse-init/init_distributed_tables.sql:/init_distributed_tables.sql"
+      - "./clickhouse-init/create-database.sql:/create-database.sql"
     entrypoint: |
       bash -c '
         sleep 2
         export HOME=/var/lib/clickhouse/
-        cat /init.sql | clickhouse client --host clickhouse-server-1 --multiquery'
+        cat /create-database.sql | clickhouse client --host clickhouse-server-1 --multiquery
+        cat /create-database.sql | clickhouse client --host clickhouse-server-2 --multiquery
+        cat /create-database.sql | clickhouse client --host clickhouse-server-3 --multiquery
+        cat /create-database.sql | clickhouse client --host clickhouse-server-4 --multiquery
+        cat /init_local_tables_1.sql | clickhouse client --host clickhouse-server-1 --multiquery
+        cat /init_local_tables_2.sql | clickhouse client --host clickhouse-server-2 --multiquery
+        cat /init_local_tables_3.sql | clickhouse client --host clickhouse-server-3 --multiquery
+        cat /init_local_tables_4.sql | clickhouse client --host clickhouse-server-4 --multiquery
+        cat /init_distributed_tables.sql | clickhouse client --host clickhouse-server-1 --database default --multiquery
+        cat /init_distributed_tables.sql | clickhouse client --host clickhouse-server-2 --database default --multiquery
+        cat /init_distributed_tables.sql | clickhouse client --host clickhouse-server-3 --database default --multiquery
+        cat /init_distributed_tables.sql | clickhouse client --host clickhouse-server-4 --database default --multiquery'
+
   carbon-clickhouse:
     build:
       context: ./carbon-clickhouse
     volumes:
       - ./carbon-clickhouse/config.conf:/etc/carbon-clickhouse/config.conf
-      - ./carbon-clickhouse/logs:/var/log/carbon-clickhouse/
       - ./carbon-clickhouse/data:/data/carbon-clickhouse/
     depends_on:
       - clickhouse-init
