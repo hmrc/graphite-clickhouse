@@ -122,19 +122,78 @@ services:
         cat /init_distributed_tables.sql | clickhouse client --host clickhouse-server-2 --database default --multiquery
         cat /init_distributed_tables.sql | clickhouse client --host clickhouse-server-3 --database default --multiquery
         cat /init_distributed_tables.sql | clickhouse client --host clickhouse-server-4 --database default --multiquery'
-
-  carbon-clickhouse:
+  carbon-clickhouse-1:
     build:
       context: ./carbon-clickhouse
     volumes:
-      - ./carbon-clickhouse/config.conf:/etc/carbon-clickhouse/config.conf
+      - ./carbon-clickhouse/shard-1-config.conf:/etc/carbon-clickhouse/config.conf
       - ./carbon-clickhouse/data:/data/carbon-clickhouse/
     depends_on:
       - clickhouse-init
+    expose:
+      - 2003
+      - 2004
+      - 2005
+      - 2006
+      - 2007
+      - 7007
+  carbon-clickhouse-2:
+    build:
+      context: ./carbon-clickhouse
+    volumes:
+      - ./carbon-clickhouse/shard-1-config.conf:/etc/carbon-clickhouse/config.conf
+      - ./carbon-clickhouse/data:/data/carbon-clickhouse/
+    depends_on:
+      - clickhouse-init
+    expose:
+      - 2003
+      - 2004
+      - 2005
+      - 2006
+      - 2007
+      - 7007
+  carbon-clickhouse-3:
+    build:
+      context: ./carbon-clickhouse
+    volumes:
+      - ./carbon-clickhouse/shard-2-config.conf:/etc/carbon-clickhouse/config.conf
+      - ./carbon-clickhouse/data:/data/carbon-clickhouse/
+    depends_on:
+      - clickhouse-init
+    expose:
+      - 2003
+      - 2004
+      - 2005
+      - 2006
+      - 2007
+      - 7007
+  carbon-clickhouse-4:
+    build:
+      context: ./carbon-clickhouse
+    volumes:
+      - ./carbon-clickhouse/shard-2-config.conf:/etc/carbon-clickhouse/config.conf
+      - ./carbon-clickhouse/data:/data/carbon-clickhouse/
+    depends_on:
+      - clickhouse-init
+    expose:
+      - 2003
+      - 2004
+      - 2005
+      - 2006
+      - 2007
+      - 7007
+  metrics-haproxy:
+    image: haproxy
+    hostname: metrics-haproxy
+    volumes:
+      - ./metrics-haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
     ports:
       - 2003:2003
       - 2004:2004
       - 2005:2005
       - 2006:2006
       - 2007:2007
-      - 7007:7007
+      - 7007:7003
+    depends_on:
+      - carbon-clickhouse-1
+
