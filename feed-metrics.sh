@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-INTERVAL=30
+INTERVAL=5
 PORTS="2003"
 
 # If this is Linux the netcat cr/lf option is different than on a Mac
