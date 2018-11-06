@@ -1,29 +1,37 @@
-# Quick Start
-```sh
+# Clickhouse Graphite Metric Cluster
+
+This repository contains a number of docker containers for a Clickhouse cluster using Zookeeper and carbon-clickhouse to
+feed metrics. The cluster has two shards, with two containers (replicas) in each shard.
+
+To start the cluster:
+```bash
 docker-compose up
 ```
 
-Forked then https://github.com/lomik/graphite-clickhouse-tldr and then changed quite a bit.
-documentation has not caught up yet.
+ Container           | Notes
+ ------------------- | ----------------
+ zookeeper-1         | Used by Clickhouse replication
+ zookeeper-2         |
+ zookeeper-3         |
+ clickhouse-server-1 | Shard 1 replica 1
+ clickhouse-server-2 | Shard 1 replica 2
+ clickhouse-server-3 | Shard 2 replica 1
+ clickhouse-server-4 | Shard 2 replica 2
+ clickhouse-init     | Used to run sql to create schemas on each server
+ carbon-clickhouse   | A translation layer that is able to take carbon input protocols and write them to clickhouse-server-1
 
+## Loading graphite data
 
+There is a shell script that simulates a dice roll that is sent to carbon-clickhouse every 30 seconds. It only sends
+data to the first replica of the first cluster, but it's good enough to demonstrate the concepts of sharding,
+replication and distributed tables:
+- If you select from testcluster_shard_1.graphite on clickhouse-server-1 the dice roll data will be present.
+- If you select from testcluster_shard_1.graphite on clickhouse-server-2 the dice roll data will be present (since it is replicated).
+- If you select from testcluster_shard_2.graphite on clickhouse-server-3 or clickhouse-server-4 then no data will be present (since it does not exist in that shard)
+- If you select data from graphite_distributed on any container then the data will be returned since distributed tables
+look across the whole cluster.
 
-
-## Mapped Ports
-
-Host | Container | Service
----- | --------- | -------------------------------------------------------------------------------------------------------------------
-  80 |        80 | [nginx](https://www.nginx.com/resources/admin-guide/)
-2003 |      2003 | [carbon receiver - plaintext](http://graphite.readthedocs.io/en/latest/feeding-carbon.html#the-plaintext-protocol)
-2004 |      2004 | [carbon receiver - pickle](http://graphite.readthedocs.io/en/latest/feeding-carbon.html#the-pickle-protocol)
-2006 |      2006 | [carbon receiver - prometheus remote write](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#%3Cremote_write%3E)
-3000 |      3000 | Grafana
-
-## Loading with haggar
-
-Where <<IP_ADDRESS>> is your local machine address (127.0.0.1 does not work on macs)
-
+To send data:
 ```
-docker run -it egaillardon/haggar -carbon <<IP_ADRESS>>:2003 -agents 10 -metrics 100
+./feed-metrics.sh
 ```
-
