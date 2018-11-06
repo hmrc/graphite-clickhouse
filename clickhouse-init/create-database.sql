@@ -1,2 +1,0 @@
-CREATE DATABASE IF NOT EXISTS testcluster_shard_1;
-CREATE DATABASE IF NOT EXISTS testcluster_shard_2;

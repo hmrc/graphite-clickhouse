@@ -1,0 +1,1 @@
+CREATE DATABASE IF NOT EXISTS testcluster_shard_{{ THIS_SHARD }};

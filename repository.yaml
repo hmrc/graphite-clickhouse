@@ -8,4 +8,3 @@ leakDetectionExemptions:
       - '/clickhouse-server/config.xml'
       - '/docker-compose.yaml'
       - '/clickhouse-server/config.xml.new'
-      - '/clickhouse-server/config.xml.bak'

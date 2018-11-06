@@ -82,5 +82,42 @@
         <max_suspicious_broken_parts>5</max_suspicious_broken_parts>
     </merge_tree>
 
+    <remote_servers from_zk="/clickhouse/remote_servers">
+    </remote_servers>
+
+    <!--
+    <graphite from_zk="/clickhouse/graphite">
+    </graphite>
+
+    <listen_host from_zk="/clickhouse/listen_host">0.0.0.0</listen_host>
+
+    <graphite_rollup from_zk="/clickhouse/graphite_rollup">
+    </graphite_rollup>
+
+    <macros from_zk="/clickhouse/macros">
+    </macros>
+
+    <compression from_zk="/clickhouse/compression">
+        <case>
+            <method>zstd</method>
+        </case>
+    </compression>
+      -->
+
+    <zookeeper>
+        <node>
+            <host>graphite-clickhouse_zookeeper-1_1</host>
+            <port>2181</port>
+        </node>
+        <node>
+            <host>graphite-clickhouse_zookeeper-2_1</host>
+            <port>2181</port>
+        </node>
+        <node>
+            <host>graphite-clickhouse_zookeeper-3_1</host>
+            <port>2181</port>
+        </node>
+    </zookeeper>
+
     <format_schema_path>/var/lib/clickhouse/format_schemas/</format_schema_path>
 </yandex>
