@@ -4,8 +4,10 @@ services:
     image: zookeeper
     restart: always
     hostname: zookeeper-1
+    logging:
+      driver: "none"
     ports:
-      - 2182:2181
+      - 2181:2181
     expose:
       - 2181
       - 2888
@@ -13,12 +15,17 @@ services:
     environment:
       ZOO_MY_ID: 1
       ZOO_SERVERS: server.1=0.0.0.0:2888:3888 server.2=zookeeper-2:2888:3888 server.3=zookeeper-3:2888:3888
+    entrypoint: |
+      bash -c '
+        /docker-entrypoint.sh zkServer.sh start-foreground'
   zookeeper-2:
     image: zookeeper
     restart: always
     hostname: zookeeper-2
+    logging:
+      driver: "none"
     ports:
-      - 2183:2181
+      - 2182:2181
     expose:
       - 2181
       - 2888
@@ -26,14 +33,19 @@ services:
     environment:
       ZOO_MY_ID: 2
       ZOO_SERVERS: server.1=zookeeper-1:2888:3888 server.2=0.0.0.0:2888:3888 server.3=zookeeper-3:2888:3888
+    entrypoint: |
+      bash -c '
+        /docker-entrypoint.sh zkServer.sh start-foreground'
     depends_on:
       - zookeeper-1
   zookeeper-3:
     image: zookeeper
     restart: always
     hostname: zookeeper-3
+    logging:
+      driver: "none"
     ports:
-      - 2184:2181
+      - 2183:2181
     expose:
       - 2181
       - 2888
@@ -41,19 +53,39 @@ services:
     environment:
       ZOO_MY_ID: 3
       ZOO_SERVERS: server.1=zookeeper-1:2888:3888 server.2=zookeeper-2:2888:3888 server.3=0.0.0.0:2888:3888
+    entrypoint: |
+      bash -c '
+        /docker-entrypoint.sh zkServer.sh start-foreground'
     depends_on:
       - zookeeper-1
       - zookeeper-2
-  clickhouse-server-1:
-    build:
-      context: ./clickhouse-server
+  zookeeper-init:
+    image: zookeeper
+    restart: on-failure
+    hostname: zookeeper-init
+    volumes:
+      - "./zookeeper-init/remote_servers.xml:/remote_servers.xml"
+      - "./zookeeper-init/compression.xml:/compression.xml"
+      - "./zookeeper-init/graphite.xml:/graphite.xml"
+      - "./zookeeper-init/graphite_rollup.xml:/graphite_rollup.xml"
+      - "./zookeeper-init/clickhouse_zoo_config.sh:/clickhouse_zoo_config.sh"
+    environment:
+      - CLICKHOUSE_CONFIGS=remote_servers compression graphite graphite_rollup
+    entrypoint: |
+      bash -c '
+        sleep 17
+        /clickhouse_zoo_config.sh'
     depends_on:
       - zookeeper-1
       - zookeeper-2
       - zookeeper-3
+  clickhouse-server-1:
+    build:
+      context: ./clickhouse-server
+    depends_on:
+      - zookeeper-3
     volumes:
       - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
-      - ./clickhouse-server/rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
     privileged: true
     expose:
       - 9000
@@ -65,7 +97,6 @@ services:
       - clickhouse-server-1
     volumes:
       - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
-      - ./clickhouse-server/rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
     privileged: true
     expose:
       - 9000
@@ -77,7 +108,6 @@ services:
       - clickhouse-server-2
     volumes:
       - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
-      - ./clickhouse-server/rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
     privileged: true
     expose:
       - 9000
@@ -89,7 +119,6 @@ services:
       - clickhouse-server-3
     volumes:
       - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
-      - ./clickhouse-server/rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
     privileged: true
     expose:
       - 9000
@@ -97,31 +126,20 @@ services:
   clickhouse-init:
     build:
       context: ./clickhouse-init
+    restart: on-failure
     depends_on:
       - clickhouse-server-4
     volumes:
-      - "./clickhouse-init/init_local_tables_1.sql:/init_local_tables_1.sql"
-      - "./clickhouse-init/init_local_tables_2.sql:/init_local_tables_2.sql"
-      - "./clickhouse-init/init_local_tables_3.sql:/init_local_tables_3.sql"
-      - "./clickhouse-init/init_local_tables_4.sql:/init_local_tables_4.sql"
+      - "./clickhouse-init/create_database.sql.tpl:/create_database.sql.tpl"
+      - "./clickhouse-init/init_local_tables.sql.tpl:/init_local_tables.sql.tpl"
       - "./clickhouse-init/init_distributed_tables.sql:/init_distributed_tables.sql"
-      - "./clickhouse-init/create-database.sql:/create-database.sql"
+      - "./clickhouse-init/clickhouse-db-init.sh:/clickhouse-db-init.sh"
+    environment:
+      - CLICKHOUSE_CONFIGS=remote_servers compression graphite graphite_rollup 
     entrypoint: |
       bash -c '
-        sleep 2
-        export HOME=/var/lib/clickhouse/
-        cat /create-database.sql | clickhouse client --host clickhouse-server-1 --multiquery
-        cat /create-database.sql | clickhouse client --host clickhouse-server-2 --multiquery
-        cat /create-database.sql | clickhouse client --host clickhouse-server-3 --multiquery
-        cat /create-database.sql | clickhouse client --host clickhouse-server-4 --multiquery
-        cat /init_local_tables_1.sql | clickhouse client --host clickhouse-server-1 --multiquery
-        cat /init_local_tables_2.sql | clickhouse client --host clickhouse-server-2 --multiquery
-        cat /init_local_tables_3.sql | clickhouse client --host clickhouse-server-3 --multiquery
-        cat /init_local_tables_4.sql | clickhouse client --host clickhouse-server-4 --multiquery
-        cat /init_distributed_tables.sql | clickhouse client --host clickhouse-server-1 --database default --multiquery
-        cat /init_distributed_tables.sql | clickhouse client --host clickhouse-server-2 --database default --multiquery
-        cat /init_distributed_tables.sql | clickhouse client --host clickhouse-server-3 --database default --multiquery
-        cat /init_distributed_tables.sql | clickhouse client --host clickhouse-server-4 --database default --multiquery'
+        sleep 40
+        /clickhouse-db-init.sh'
   carbon-clickhouse-1:
     build:
       context: ./carbon-clickhouse
@@ -144,7 +162,7 @@ services:
       - ./carbon-clickhouse/shard-1-config.conf:/etc/carbon-clickhouse/config.conf
       - ./carbon-clickhouse/data:/data/carbon-clickhouse/
     depends_on:
-      - clickhouse-init
+      - clickhouse-server-4
     expose:
       - 2003
       - 2004
@@ -159,7 +177,7 @@ services:
       - ./carbon-clickhouse/shard-2-config.conf:/etc/carbon-clickhouse/config.conf
       - ./carbon-clickhouse/data:/data/carbon-clickhouse/
     depends_on:
-      - clickhouse-init
+      - clickhouse-server-4
     expose:
       - 2003
       - 2004
@@ -174,7 +192,7 @@ services:
       - ./carbon-clickhouse/shard-2-config.conf:/etc/carbon-clickhouse/config.conf
       - ./carbon-clickhouse/data:/data/carbon-clickhouse/
     depends_on:
-      - clickhouse-init
+      - clickhouse-server-4
     expose:
       - 2003
       - 2004
@@ -195,5 +213,4 @@ services:
       - 2007:2007
       - 7007:7003
     depends_on:
-      - carbon-clickhouse-1
-
+      - carbon-clickhouse-4

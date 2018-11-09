@@ -33,5 +33,3 @@ look across the whole cluster.
 
 To send data:
 ```
-./feed-metrics.sh
-```

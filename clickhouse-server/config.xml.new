@@ -23,7 +23,7 @@
             <preferServerCiphers>true</preferServerCiphers>
         </server>
 
-        <client> <!-- Used for connecting to https dictionary source -->
+        <client>
             <loadDefaultCAFile>true</loadDefaultCAFile>
             <cacheSessions>true</cacheSessions>
             <disableProtocols>sslv2,sslv3</disableProtocols>
@@ -82,21 +82,28 @@
         <max_suspicious_broken_parts>5</max_suspicious_broken_parts>
     </merge_tree>
 
-    <macros from_zk="/clickhouse/macros">
-    </macros>
-
     <remote_servers from_zk="/clickhouse/remote_servers">
     </remote_servers>
 
+    <!--
     <graphite from_zk="/clickhouse/graphite">
     </graphite>
+
+    <listen_host from_zk="/clickhouse/listen_host">0.0.0.0</listen_host>
 
     <graphite_rollup from_zk="/clickhouse/graphite_rollup">
     </graphite_rollup>
 
+    <macros from_zk="/clickhouse/macros">
+    </macros>
+
     <compression from_zk="/clickhouse/compression">
+        <case>
+            <method>zstd</method>
+        </case>
     </compression>
-    <listen_host>0.0.0.0</listen_host>
+      -->
+
     <zookeeper>
         <node>
             <host>graphite-clickhouse_zookeeper-1_1</host>
