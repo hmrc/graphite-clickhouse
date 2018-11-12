@@ -13,6 +13,7 @@ docker-compose up
  zookeeper-1         | Used by Clickhouse replication
  zookeeper-2         |
  zookeeper-3         |
+ zookeeper-init      | Inserts znodes containing Clickhouse config into Zookeeper
  clickhouse-server-1 | Shard 1 replica 1
  clickhouse-server-2 | Shard 1 replica 2
  clickhouse-server-3 | Shard 2 replica 1
