@@ -2,10 +2,12 @@
             <shard>
                 <internal_replication>true</internal_replication>
                 <replica>
+                    <default_database>graphite_shard_1</default_database>
                     <host>graphite-clickhouse_clickhouse-server-1_1</host>
                     <port>9000</port>
                 </replica>
                 <replica>
+                    <default_database>graphite_shard_1</default_database>
                     <host>graphite-clickhouse_clickhouse-server-2_1</host>
                     <port>9000</port>
                 </replica>
@@ -13,10 +15,12 @@
             <shard>
                 <internal_replication>true</internal_replication>
                 <replica>
+                    <default_database>graphite_shard_2</default_database>
                     <host>graphite-clickhouse_clickhouse-server-3_1</host>
                     <port>9000</port>
                 </replica>
                 <replica>
+                    <default_database>graphite_shard_2</default_database>
                     <host>graphite-clickhouse_clickhouse-server-4_1</host>
                     <port>9000</port>
                 </replica>
