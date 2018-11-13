@@ -130,7 +130,6 @@ services:
     depends_on:
       - clickhouse-server-4
     volumes:
-      - "./clickhouse-init/create_database.sql.tpl:/create_database.sql.tpl"
       - "./clickhouse-init/init_local_tables.sql.tpl:/init_local_tables.sql.tpl"
       - "./clickhouse-init/init_distributed_tables.sql:/init_distributed_tables.sql"
       - "./clickhouse-init/clickhouse-db-init.sh:/clickhouse-db-init.sh"
@@ -174,7 +173,7 @@ services:
     build:
       context: ./carbon-clickhouse
     volumes:
-      - ./carbon-clickhouse/shard-2-config.conf:/etc/carbon-clickhouse/config.conf
+      - ./carbon-clickhouse/shard-3-config.conf:/etc/carbon-clickhouse/config.conf
       - ./carbon-clickhouse/data:/data/carbon-clickhouse/
     depends_on:
       - clickhouse-server-4
@@ -189,7 +188,7 @@ services:
     build:
       context: ./carbon-clickhouse
     volumes:
-      - ./carbon-clickhouse/shard-2-config.conf:/etc/carbon-clickhouse/config.conf
+      - ./carbon-clickhouse/shard-4-config.conf:/etc/carbon-clickhouse/config.conf
       - ./carbon-clickhouse/data:/data/carbon-clickhouse/
     depends_on:
       - clickhouse-server-4

@@ -82,9 +82,6 @@
         <max_suspicious_broken_parts>5</max_suspicious_broken_parts>
     </merge_tree>
 
-    <macros from_zk="/clickhouse/macros">
-    </macros>
-
     <remote_servers from_zk="/clickhouse/remote_servers">
     </remote_servers>
 
