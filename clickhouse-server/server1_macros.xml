@@ -1,6 +1,0 @@
-<yandex>
-    <macros>
-        <shard1>testcluster_shard_1</shard1>
-        <shard2>testcluster_shard_2</shard2>
-    </macros>
-</yandex>

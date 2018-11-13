@@ -74,15 +74,15 @@ for SERVER in $SERVER_LIST; do
   echo "Number $SERVER shard:$THIS_SHARD replica:$THIS_REPLICA"
 
   # Create create_database.sql
-  THIS_SHARD=${THIS_SHARD} \
-      envtpl -o /create_database.sql \
-      --keep-template \
-      /create_database.sql.tpl
-  cat /create_database.sql
-  if [ $? -ne 0 ]; then 
-      echo "envtpl failed, exiting non-zero"
-      exit 99
-  fi
+  #THIS_SHARD=${THIS_SHARD} \
+  #    envtpl -o /create_database.sql \
+  #    --keep-template \
+  #    /create_database.sql.tpl
+  #cat /create_database.sql
+  #if [ $? -ne 0 ]; then 
+  #    echo "envtpl failed, exiting non-zero"
+  #    exit 99
+  #fi
 
   
   # Create local_tables.sql
@@ -97,13 +97,13 @@ for SERVER in $SERVER_LIST; do
   fi
 
   # Check all files created
-  for FILE in create_database.sql init_local_tables.sql init_distributed_tables.sql; do
+  for FILE in init_local_tables.sql init_distributed_tables.sql; do
       if [ "$(cat /$FILE | wc -l)" -gt 0 ]; then
-	echo "$FILE is not empty.."
+        echo "$FILE is non-empty, running it.."
         cat /$FILE | clickhouse client --host ${SERVER} --multiquery
       else 
-	echo "$FILE is empty, exiting.."
-	exit 99
+        echo "$FILE is empty so templating failed, exiting.."
+        exit 99
       fi 
   done
 
