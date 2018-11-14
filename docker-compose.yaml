@@ -132,6 +132,7 @@ services:
     volumes:
       - "./clickhouse-init/init_local_tables.sql.tpl:/init_local_tables.sql.tpl"
       - "./clickhouse-init/init_distributed_tables.sql:/init_distributed_tables.sql"
+      - "./clickhouse-init/create_database.sql.tpl:/create_database.sql.tpl"
       - "./clickhouse-init/clickhouse-db-init.sh:/clickhouse-db-init.sh"
     environment:
       - CLICKHOUSE_CONFIGS=remote_servers compression graphite graphite_rollup 
@@ -144,7 +145,6 @@ services:
       context: ./carbon-clickhouse
     volumes:
       - ./carbon-clickhouse/shard-1-config.conf:/etc/carbon-clickhouse/config.conf
-      - ./carbon-clickhouse/data:/data/carbon-clickhouse/
     depends_on:
       - clickhouse-init
     expose:
@@ -158,10 +158,9 @@ services:
     build:
       context: ./carbon-clickhouse
     volumes:
-      - ./carbon-clickhouse/shard-1-config.conf:/etc/carbon-clickhouse/config.conf
-      - ./carbon-clickhouse/data:/data/carbon-clickhouse/
+      - ./carbon-clickhouse/shard-2-config.conf:/etc/carbon-clickhouse/config.conf
     depends_on:
-      - clickhouse-server-4
+      - clickhouse-init
     expose:
       - 2003
       - 2004
@@ -174,9 +173,8 @@ services:
       context: ./carbon-clickhouse
     volumes:
       - ./carbon-clickhouse/shard-3-config.conf:/etc/carbon-clickhouse/config.conf
-      - ./carbon-clickhouse/data:/data/carbon-clickhouse/
     depends_on:
-      - clickhouse-server-4
+      - clickhouse-init
     expose:
       - 2003
       - 2004
@@ -189,9 +187,8 @@ services:
       context: ./carbon-clickhouse
     volumes:
       - ./carbon-clickhouse/shard-4-config.conf:/etc/carbon-clickhouse/config.conf
-      - ./carbon-clickhouse/data:/data/carbon-clickhouse/
     depends_on:
-      - clickhouse-server-4
+      - clickhouse-init
     expose:
       - 2003
       - 2004

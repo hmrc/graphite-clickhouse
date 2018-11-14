@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS default.graphite (
+CREATE TABLE IF NOT EXISTS graphite_shard_{{ THIS_SHARD }}.graphite (
   Path String,
   Value Float64,
   Time UInt32,
@@ -9,7 +9,7 @@ PARTITION BY toMonday(Date)
 ORDER BY (Path, Time);
 
 -- optional table for faster metric search
-CREATE TABLE IF NOT EXISTS default.graphite_tree (
+CREATE TABLE IF NOT EXISTS graphite_shard_{{ THIS_SHARD }}.graphite_tree (
   Date Date,
   Level UInt32,
   Path String,

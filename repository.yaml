@@ -8,3 +8,4 @@ leakDetectionExemptions:
       - '/clickhouse-server/config.xml'
       - '/docker-compose.yaml'
       - '/clickhouse-server/config.xml.new'
+      - '/zookeeper-init/listen_host.xml'

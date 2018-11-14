@@ -16,6 +16,8 @@ do
   echo "local.random.diceroll ${RAND_NUM} `date +%s`"
   for PORT in ${PORTS}; do
     echo "local.random.diceroll ${RAND_NUM} `date +%s`" | nc -"${NC_KEY:-c}" localhost "${PORT}"
+    echo "local.random.diceroll2 ${RAND_NUM} `date +%s`" | nc -"${NC_KEY:-c}" localhost "${PORT}"
+    echo "local.random.diceroll3 ${RAND_NUM} `date +%s`" | nc -"${NC_KEY:-c}" localhost "${PORT}"
   done
   sleep ${INTERVAL}
 done

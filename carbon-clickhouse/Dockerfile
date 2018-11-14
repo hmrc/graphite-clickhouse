@@ -15,5 +15,6 @@ ENV PATH="/usr/local/go/bin:${PATH}"
 RUN mv carbon-clickhouse-$version carbon-clickhouse
 RUN cd carbon-clickhouse && make
 RUN mkdir -p /var/log/carbon-clickhouse/
+RUN mkdir -p /data/carbon-clickhouse
 
 ENTRYPOINT /carbon-clickhouse/carbon-clickhouse -config=/etc/carbon-clickhouse/config.conf
