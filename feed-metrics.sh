@@ -12,12 +12,22 @@ fi
 
 while true
 do
-  RAND_NUM=$((RANDOM % (6) + 1 ))
-  echo "local.random.diceroll ${RAND_NUM} `date +%s`"
   for PORT in ${PORTS}; do
-    echo "local.random.diceroll ${RAND_NUM} `date +%s`" | nc -"${NC_KEY:-c}" localhost "${PORT}"
-    echo "local.random.diceroll2 ${RAND_NUM} `date +%s`" | nc -"${NC_KEY:-c}" localhost "${PORT}"
-    echo "local.random.diceroll3 ${RAND_NUM} `date +%s`" | nc -"${NC_KEY:-c}" localhost "${PORT}"
+    RAND_NUM=$((RANDOM % (10) + 1 ))
+    echo "play.somecontainer.diceroll ${RAND_NUM} `date +%s`" | nc -"${NC_KEY:-c}" localhost "${PORT}"
+    echo "play.somecontainer.diceroll ${RAND_NUM} `date +%s`"
+    RAND_NUM=$((RANDOM % (10) + 1 ))
+    echo "play.anothercontainer.diceroll ${RAND_NUM} `date +%s`" | nc -"${NC_KEY:-c}" localhost "${PORT}"
+    echo "play.anothercontainer.diceroll ${RAND_NUM} `date +%s`"
+    RAND_NUM=$((RANDOM % (10) + 1 ))
+    echo "play.thiscontainer.diceroll ${RAND_NUM} `date +%s`" | nc -"${NC_KEY:-c}" localhost "${PORT}"
+    echo "play.thiscontainer.diceroll ${RAND_NUM} `date +%s`"
+    RAND_NUM=$((RANDOM % (10) + 1 ))
+    echo "play.thatcontainer.diceroll ${RAND_NUM} `date +%s`" | nc -"${NC_KEY:-c}" localhost "${PORT}"
+    echo "play.thatcontainer.diceroll ${RAND_NUM} `date +%s`"
+    RAND_NUM=$((RANDOM % (10) + 1 ))
+    echo "play.whatcontainer.diceroll ${RAND_NUM} `date +%s`" | nc -"${NC_KEY:-c}" localhost "${PORT}"
+    echo "play.whatcontainer.diceroll ${RAND_NUM} `date +%s`"
   done
   sleep ${INTERVAL}
 done

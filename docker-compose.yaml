@@ -73,8 +73,8 @@ services:
       - CLICKHOUSE_CONFIGS=remote_servers compression graphite graphite_rollup
     entrypoint: |
       bash -c '
-        sleep 17
-        /clickhouse_zoo_config.sh'
+        sleep 40
+        /clickhouse_zoo_config.sh 2>/dev/null'
     depends_on:
       - zookeeper-1
       - zookeeper-2
@@ -138,7 +138,7 @@ services:
       - CLICKHOUSE_CONFIGS=remote_servers compression graphite graphite_rollup 
     entrypoint: |
       bash -c '
-        sleep 40
+        sleep 120
         /clickhouse-db-init.sh'
   carbon-clickhouse-1:
     build:
@@ -208,5 +208,7 @@ services:
       - 2006:2006
       - 2007:2007
       - 7007:7003
+    expose:
+      - 2003
     depends_on:
       - carbon-clickhouse-4

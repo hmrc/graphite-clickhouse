@@ -1,6 +1,6 @@
         <host>graphite-clickhouse_metrics-haproxy_1</host>
         <port>2003</port>
-        <timeout>0.1</timeout>
+        <timeout>1.0</timeout>
         <interval>60</interval>
         <root_path>one_min</root_path>
         <hostname_in_path>true</hostname_in_path>
