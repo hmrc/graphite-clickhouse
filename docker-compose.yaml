@@ -208,5 +208,7 @@ services:
       - 2006:2006
       - 2007:2007
       - 7007:7003
+    expose:
+      - 2003
     depends_on:
       - carbon-clickhouse-4

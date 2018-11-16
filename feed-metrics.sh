@@ -25,6 +25,9 @@ do
     RAND_NUM=$((RANDOM % (10) + 1 ))
     echo "play.thatcontainer.diceroll ${RAND_NUM} `date +%s`" | nc -"${NC_KEY:-c}" localhost "${PORT}"
     echo "play.thatcontainer.diceroll ${RAND_NUM} `date +%s`"
+    RAND_NUM=$((RANDOM % (10) + 1 ))
+    echo "play.whatcontainer.diceroll ${RAND_NUM} `date +%s`" | nc -"${NC_KEY:-c}" localhost "${PORT}"
+    echo "play.whatcontainer.diceroll ${RAND_NUM} `date +%s`"
   done
   sleep ${INTERVAL}
 done
