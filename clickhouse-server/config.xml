@@ -51,10 +51,6 @@
 
     <tmp_path>/var/lib/clickhouse/tmp/</tmp_path>
 
-    <user_files_path>/var/lib/clickhouse/user_files/</user_files_path>
-
-    <users_config>users.xml</users_config>
-
     <default_profile>default</default_profile>
 
     <default_database>default</default_database>
@@ -82,6 +78,19 @@
         <max_suspicious_broken_parts>5</max_suspicious_broken_parts>
     </merge_tree>
 
+    <users_config from_zk="/clickhouse/users_all"></users_config>
+
+    <!--
+    <quotas from_zk="/clickhouse/quotas">
+    </quotas>
+
+    <profiles from_zk="/clickhouse/profiles">
+    </profiles>
+
+    <users from_zk="/clickhouse/users">
+    </users>
+      -->
+
     <remote_servers from_zk="/clickhouse/remote_servers">
     </remote_servers>
 
@@ -108,6 +117,7 @@
             <port>2181</port>
         </node>
     </zookeeper>
+    <max_replica_delay_for_distributed_queries>1</max_replica_delay_for_distributed_queries>
 
     <format_schema_path>/var/lib/clickhouse/format_schemas/</format_schema_path>
 </yandex>
