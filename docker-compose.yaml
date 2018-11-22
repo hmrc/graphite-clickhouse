@@ -65,16 +65,13 @@ services:
     hostname: zookeeper-init
     volumes:
       - "./zookeeper-init/remote_servers.xml:/remote_servers.xml"
-      - "./zookeeper-init/quotas.xml:/quotas.xml"
-      - "./zookeeper-init/profiles.xml:/profiles.xml"
       - "./zookeeper-init/users.xml:/users.xml"
-      - "./zookeeper-init/users_all.xml:/users_all.xml"
       - "./zookeeper-init/compression.xml:/compression.xml"
       - "./zookeeper-init/graphite.xml:/graphite.xml"
       - "./zookeeper-init/graphite_rollup.xml:/graphite_rollup.xml"
       - "./zookeeper-init/clickhouse_zoo_config.sh:/clickhouse_zoo_config.sh"
     environment:
-      - CLICKHOUSE_CONFIGS=remote_servers users_all compression graphite graphite_rollup
+      - CLICKHOUSE_CONFIGS=remote_servers users compression graphite graphite_rollup
     entrypoint: |
       bash -c '
         sleep 30
@@ -90,6 +87,7 @@ services:
     depends_on:
       - zookeeper-3
     volumes:
+      - ./clickhouse-server/clickhouse-server.err.log:/var/log/clickhouse-server/clickhouse-server.err.log
       - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
     privileged: true
     expose:
@@ -143,10 +141,10 @@ services:
       - "./clickhouse-init/create_database.sql.tpl:/create_database.sql.tpl"
       - "./clickhouse-init/clickhouse-db-init.sh:/clickhouse-db-init.sh"
     environment:
-      - CLICKHOUSE_CONFIGS=remote_servers users_all compression graphite graphite_rollup 
+      - CLICKHOUSE_CONFIGS=remote_servers users compression graphite graphite_rollup 
     entrypoint: |
       bash -c '
-        sleep 120
+        sleep 50
         /clickhouse-db-init.sh'
   carbon-clickhouse-1:
     build:

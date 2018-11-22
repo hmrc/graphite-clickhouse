@@ -78,30 +78,20 @@
         <max_suspicious_broken_parts>5</max_suspicious_broken_parts>
     </merge_tree>
 
-    <users_config from_zk="/clickhouse/users_all"></users_config>
+    <users_config from_zk="/clickhouse/users" replace="replace">users.xml</users_config>
 
-    <!--
-    <quotas from_zk="/clickhouse/quotas">
-    </quotas>
-
-    <profiles from_zk="/clickhouse/profiles">
-    </profiles>
-
-    <users from_zk="/clickhouse/users">
-    </users>
-      -->
-
-    <remote_servers from_zk="/clickhouse/remote_servers">
+    <remote_servers from_zk="/clickhouse/remote_servers" replace="replace">
     </remote_servers>
 
-    <graphite from_zk="/clickhouse/graphite">
+    <graphite from_zk="/clickhouse/graphite" replace="replace">
     </graphite>
 
-    <graphite_rollup from_zk="/clickhouse/graphite_rollup">
+    <graphite_rollup from_zk="/clickhouse/graphite_rollup" replace="replace">
     </graphite_rollup>
 
-    <compression from_zk="/clickhouse/compression">
+    <compression from_zk="/clickhouse/compression" replace="replace">
     </compression>
+
     <listen_host>0.0.0.0</listen_host>
     <zookeeper>
         <node>
