@@ -139,6 +139,7 @@ services:
       - "./clickhouse-init/init_local_tables.sql.tpl:/init_local_tables.sql.tpl"
       - "./clickhouse-init/init_distributed_tables.sql:/init_distributed_tables.sql"
       - "./clickhouse-init/create_database.sql.tpl:/create_database.sql.tpl"
+      - "./clickhouse-init/table_exists_test.sql:/table_exists_test.sql"
       - "./clickhouse-init/clickhouse-db-init.sh:/clickhouse-db-init.sh"
     environment:
       - CLICKHOUSE_CONFIGS=remote_servers users compression graphite graphite_rollup 

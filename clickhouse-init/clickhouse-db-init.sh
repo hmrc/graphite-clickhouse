@@ -95,14 +95,24 @@ for SERVER in $SERVER_LIST; do
   fi
 
   # Check all files were created and run them
-  for FILE in create_database.sql init_local_tables.sql init_distributed_tables.sql; do
-      if [ "$(cat /$FILE | wc -l)" -gt 0 ]; then
-        echo "$FILE is non-empty, running it.."
-      else 
-        echo "$FILE is empty so templating failed, exiting.."
-        exit 99
-      fi 
-      cat /$FILE | clickhouse client --host ${SERVER} --multiquery --progress
+  for FILE in create_database.sql init_local_tables.sql init_distributed_tables.sql table_exists_test.sql; do
+    if [ "$(cat /$FILE | wc -l)" -gt 0 ]; then
+      echo "$FILE is non-empty, running it.."
+    else 
+      echo "$FILE is empty so templating failed, exiting.."
+      exit 99
+    fi 
+    # test to ensure corect number of tables have been created
+    if [ "$FILE" == "table_exists_test.sql" ]; then
+	    if [ "$(cat /$FILE | clickhouse client --host ${SERVER} --multiquery --progress)" -ne 4 ]; then
+	      echo "4 tables have not been created, exiting.."
+	      exit 99
+	    else
+	      echo "4 tables have been created.."
+	    fi
+    else
+  	  cat /$FILE | clickhouse client --host ${SERVER} --multiquery --progress
+    fi
   done
 
   COUNTER=$(expr $COUNTER + 1)
