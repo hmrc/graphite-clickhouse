@@ -65,16 +65,17 @@ services:
     hostname: zookeeper-init
     volumes:
       - "./zookeeper-init/remote_servers.xml:/remote_servers.xml"
+      - "./zookeeper-init/users.xml:/users.xml"
       - "./zookeeper-init/compression.xml:/compression.xml"
       - "./zookeeper-init/graphite.xml:/graphite.xml"
       - "./zookeeper-init/graphite_rollup.xml:/graphite_rollup.xml"
       - "./zookeeper-init/clickhouse_zoo_config.sh:/clickhouse_zoo_config.sh"
     environment:
-      - CLICKHOUSE_CONFIGS=remote_servers compression graphite graphite_rollup
+      - CLICKHOUSE_CONFIGS=remote_servers users compression graphite graphite_rollup
     entrypoint: |
       bash -c '
-        sleep 40
-        /clickhouse_zoo_config.sh 2>/dev/null'
+        sleep 30
+        /clickhouse_zoo_config.sh'
     depends_on:
       - zookeeper-1
       - zookeeper-2
@@ -82,9 +83,11 @@ services:
   clickhouse-server-1:
     build:
       context: ./clickhouse-server
+    restart: on-failure
     depends_on:
       - zookeeper-3
     volumes:
+      - ./clickhouse-server/clickhouse-server.err.log:/var/log/clickhouse-server/clickhouse-server.err.log
       - ./clickhouse-server/config.xml:/etc/clickhouse-server/config.xml
     privileged: true
     expose:
@@ -93,6 +96,7 @@ services:
   clickhouse-server-2:
     build:
       context: ./clickhouse-server
+    restart: on-failure
     depends_on:
       - clickhouse-server-1
     volumes:
@@ -104,6 +108,7 @@ services:
   clickhouse-server-3:
     build:
       context: ./clickhouse-server
+    restart: on-failure
     depends_on:
       - clickhouse-server-2
     volumes:
@@ -115,6 +120,7 @@ services:
   clickhouse-server-4:
     build:
       context: ./clickhouse-server
+    restart: on-failure
     depends_on:
       - clickhouse-server-3
     volumes:
@@ -135,10 +141,10 @@ services:
       - "./clickhouse-init/create_database.sql.tpl:/create_database.sql.tpl"
       - "./clickhouse-init/clickhouse-db-init.sh:/clickhouse-db-init.sh"
     environment:
-      - CLICKHOUSE_CONFIGS=remote_servers compression graphite graphite_rollup 
+      - CLICKHOUSE_CONFIGS=remote_servers users compression graphite graphite_rollup 
     entrypoint: |
       bash -c '
-        sleep 120
+        sleep 50
         /clickhouse-db-init.sh'
   carbon-clickhouse-1:
     build:

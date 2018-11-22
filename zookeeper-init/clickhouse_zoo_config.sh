@@ -30,6 +30,9 @@ function check_znode(){
   fi
 }
 
+# Attempt to create the /clickhouse path, if Clickhouse hasn't started for some reason this will not exist so further inserts will fail
+${ZOOKEEPER_PATH}/bin/zkCli.sh -server "${ZOOKEEPER_NODE}":2181 create "/clickhouse" ""
+
 for CONFIG in ${CLICKHOUSE_CONFIGS}; do
   if [ -f "/${CONFIG}.xml" ]; then
     if [ "$(check_znode ${CONFIG})" = "no znode" ]; then
